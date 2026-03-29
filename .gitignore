@@ -1,0 +1,25 @@
+# Maven
+backend/target/
+backend/.mvn/
+!backend/.mvn/wrapper/
+
+# Claude
+.claude/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+# VS Code (may contain secrets)
+.vscode/
+
+# Data
+backend/data/
+
+# Environment
+.env
+*.env
+
+# OS
+.DS_Store
+Thumbs.db
