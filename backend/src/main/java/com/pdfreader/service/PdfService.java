@@ -6,6 +6,9 @@ import com.pdfreader.controller.dto.PdfTextResponse.PageContent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.apache.pdfbox.io.RandomAccessReadBuffer;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -32,6 +35,7 @@ public class PdfService {
 
     // ── Public API (all scoped to userId) ────────────────────────────────────
 
+    @Cacheable(value = "pdfList", key = "#userId")
     public List<PdfDocumentResponse> listAll(String userId) {
         return s3Service.listFiles(userPrefix(userId)).stream()
                 .filter(obj -> obj.key().endsWith(".pdf"))
@@ -40,6 +44,7 @@ public class PdfService {
                 .toList();
     }
 
+    @CacheEvict(value = "pdfList", key = "#userId")
     public PdfDocumentResponse upload(MultipartFile file, String title, String userId) throws IOException {
         validatePdf(file);
 
@@ -62,6 +67,7 @@ public class PdfService {
         return toResponseFromHead(s3Key, file.getSize(), head);
     }
 
+    @Cacheable(value = "pdfText", key = "#userId + ':' + #id")
     public PdfTextResponse extractText(String id, String userId) throws IOException {
         String s3Key = findKeyById(userId, id);
 
@@ -92,12 +98,18 @@ public class PdfService {
         }
     }
 
+    @Cacheable(value = "pdfMetadata", key = "#userId + ':' + #id")
     public PdfDocumentResponse getMetadata(String id, String userId) {
         String s3Key = findKeyById(userId, id);
         HeadObjectResponse head = s3Service.getMetadata(s3Key);
         return toResponseFromHead(s3Key, head.contentLength(), head);
     }
 
+    @Caching(evict = {
+        @CacheEvict(value = "pdfText",     key = "#userId + ':' + #id"),
+        @CacheEvict(value = "pdfMetadata", key = "#userId + ':' + #id"),
+        @CacheEvict(value = "pdfList",     key = "#userId")
+    })
     public void delete(String id, String userId) {
         String s3Key = findKeyById(userId, id);
         s3Service.deleteFile(s3Key);

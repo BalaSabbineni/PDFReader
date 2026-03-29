@@ -44,6 +44,8 @@ const Auth = {
     },
 
     logout() {
+        if (typeof Player !== 'undefined') Player.stop();  // sets isPlaying=false first
+        window.speechSynthesis.cancel();
         this.clearSession();
         location.reload();
     }

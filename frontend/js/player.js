@@ -38,6 +38,7 @@ const Player = (() => {
         utterance.lang  = lang || 'en-US';
 
         utterance.onend = () => {
+            if (!isPlaying) return;   // cancelled/stopped — don't advance
             if (currentPage < pages.length - 1) {
                 currentPage++;
                 if (onPageChange) onPageChange(currentPage, pages.length);
