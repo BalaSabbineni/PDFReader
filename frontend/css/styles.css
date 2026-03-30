@@ -18,10 +18,47 @@
 
 body {
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  background: var(--bg);
+  background: radial-gradient(ellipse at center, #131320 0%, #0c0c18 55%, #06060d 100%);
   color: var(--text);
   min-height: 100vh;
   padding-bottom: calc(var(--player-h) + 20px);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ─── Animated wave background ───────────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 900px 500px at 15% 85%, rgba(124, 106, 247, 0.14) 0%, transparent 65%),
+    radial-gradient(ellipse 700px 700px at 85% 15%, rgba(167, 139, 250, 0.10) 0%, transparent 65%);
+  animation: bg-wave-1 10s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 850px 380px at 50% 108%, rgba(124, 106, 247, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 500px 500px at 4% 4%, rgba(100, 80, 220, 0.07) 0%, transparent 60%);
+  animation: bg-wave-2 14s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes bg-wave-1 {
+  0%   { transform: translate(-40px, 30px) scale(1);    opacity: 0.65; }
+  100% { transform: translate(40px, -30px) scale(1.08); opacity: 1;    }
+}
+
+@keyframes bg-wave-2 {
+  0%   { transform: translate(30px, -20px); opacity: 0.55; }
+  100% { transform: translate(-30px, 20px); opacity: 1;    }
 }
 
 /* ─── Header ─────────────────────────────────────────────────────────────── */
@@ -36,6 +73,7 @@ header {
   top: 0;
   z-index: 100;
   backdrop-filter: blur(10px);
+  isolation: isolate;
 }
 
 .logo {
@@ -71,6 +109,8 @@ main {
   padding: 28px 32px;
   max-width: 1400px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-width: 900px) {
